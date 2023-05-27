@@ -2,49 +2,61 @@ package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.repository.MissingValueException;
 import ru.practicum.shareit.user.repository.NotFoundException;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.repository.UserRepositoryImpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private List<Item> items = new ArrayList<>();
-
-    final UserRepositoryImpl userRepositoryImpl;
+    private Map<Long, Item> items = new HashMap<>();
+    private Map<Long, List<Long>> itemsByUsers = new HashMap<>();
+    private static Long itemId = 1L;
+    private final UserRepository userRepository;
 
     public ItemRepositoryImpl(UserRepositoryImpl userRepositoryImpl) {
-        this.userRepositoryImpl = userRepositoryImpl;
+        this.userRepository = userRepositoryImpl;
     }
 
     @Override
-    public Item addItem(Long userId, ItemDto itemDto) {
-        if (userRepositoryImpl.getAllUsers().stream().noneMatch(user -> user.getId().equals(userId))) {
-            throw new NotFoundException("Пользователь с id " + userId + "не найден");
+    public Item addItem(Item item) {
+        if (userRepository.getAllUsers().stream().noneMatch(user -> user.getId().equals(item.getOwner()))) {
+            throw new NotFoundException("Пользователь с id " + item.getOwner() + "не найден");
         }
-        if (itemDto.getName().isBlank()) {
+        if (item.getName().isBlank()) {
             throw new MissingValueException("Имя не может быть пустым");
         }
-        if (itemDto.getAvailable() == null) {
+        if (item.getAvailable() == null) {
             throw new MissingValueException("Должен быть указан статус доступности");
         }
-        if (itemDto.getDescription() == null) {
+        if (item.getDescription() == null) {
             throw new MissingValueException("Описание не может быть пустым");
         }
-        Item item = ItemMapper.toItem(userId, itemDto);
-        items.add(item);
+        item.setId(generateId());
+        items.put(item.getId(), item);
+        List<Long> itemIds;
+        if (itemsByUsers.containsKey(item.getOwner())) {
+            itemIds = itemsByUsers.get(item.getOwner());
+            itemIds.add(item.getId());
+        } else {
+            itemIds = new ArrayList<>();
+            itemIds.add(item.getId());
+        }
+        itemsByUsers.put(item.getOwner(), itemIds);
         return item;
     }
 
     @Override
     public Item editItem(Long userId, Long itemId, ItemDto itemDto) {
-        Item item = items.stream().filter(x -> x.getId().equals(itemId)).findFirst().get();
+        Item item = items.get(itemId);
         if (item != null && item.getOwner().equals(userId)) {
             if (itemDto.getName() != null) {
                 item.setName(itemDto.getName());
@@ -55,22 +67,24 @@ public class ItemRepositoryImpl implements ItemRepository {
             if (itemDto.getDescription() != null) {
                 item.setDescription(itemDto.getDescription());
             }
-            items.remove(item);
-            items.add(item);
+            items.remove(itemId);
+            items.put(itemId, item);
         } else {
-            throw new NotFoundException("Вещь с id " + item.getId() + "не найдена");
+            throw new NotFoundException("Вещь с id " + itemId + "не найдена");
         }
         return item;
     }
 
     @Override
     public List<Item> getItemsByUser(Long userId) {
-        return items.stream().filter(item -> item.getOwner().equals(userId)).collect(Collectors.toList());
+        List<Long> itemsByUser = itemsByUsers.get(userId);
+        List<Item> itemList = items.values().stream().filter(item -> itemsByUser.contains(item.getId())).collect(Collectors.toList());
+        return itemList;
     }
 
     @Override
     public Item getItem(Long userId, Long itemId) {
-        Item item = items.stream().filter(item1 -> item1.getId().equals(itemId)).findFirst().get();
+        Item item = items.get(itemId);
         if (item != null) {
             return item;
         } else {
@@ -82,7 +96,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     public List<Item> searchForItems(Long userId, String text) {
         List<Item> itemsFound = new ArrayList<>();
         if (!text.isBlank()) {
-            itemsFound = items.stream()
+            itemsFound = items.values().stream()
                     .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase())
                             || item.getDescription().toLowerCase().contains(text.toLowerCase()))
                     .filter(Item::getAvailable)
@@ -91,4 +105,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return itemsFound;
     }
 
+    private static Long generateId() {
+        return itemId++;
+    }
 }

@@ -11,7 +11,7 @@ public interface UserRepository {
 
     User getUser(Long userId);
 
-    User createUser(UserDto userDto);
+    User createUser(User user);
 
     User updateUser(Long userId, UserDto userDto);
 

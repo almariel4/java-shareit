@@ -5,25 +5,19 @@ import ru.practicum.shareit.user.model.UserDto;
 
 public class UserMapper {
 
-    static Long userId = 1L;
-
-    private static Long generateId() {
-        return userId++;
-    }
-
-    public static UserDto toUserDto(User user) {
-        return new UserDto(
-                user.getName(),
-                user.getEmail()
-        );
+    public static UserDto toUserDto(Long userId, User user) {
+        return UserDto.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 
     public static User toUser(UserDto userDto) {
-        return new User(
-                generateId(),
-                userDto.getName(),
-                userDto.getEmail()
-        );
+        return User.builder()
+//                .id(userId)
+                .name(userDto.getName())
+                .email(userDto.getEmail())
+                .build();
     }
 
 }
