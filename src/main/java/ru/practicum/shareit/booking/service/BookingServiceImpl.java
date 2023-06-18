@@ -56,7 +56,6 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Вещь недоступна для бронирования");
         }
         Booking booking = BookingMapper.mapToBooking(bookingDto, item, user);
-        BookingMapper.mapToBookingDto(bookingRepository.save(booking));
         return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
     }
 
