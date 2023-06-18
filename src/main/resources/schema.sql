@@ -23,8 +23,6 @@ create table if not exists items (
   is_available BOOLEAN NOT NULL,
   owner_id bigint references users (id) NOT NULL,
   request_id bigint references requests(id),
-  last_booking_id bigint references bookings(id),
-  next_booking_id bigint references bookings(id),
   CONSTRAINT pk_item PRIMARY KEY (id)
 );
 
