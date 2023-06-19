@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingState;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -29,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public BookingDto addBooking(Long userId, BookingDto bookingDto) {
         Optional<Item> itemOptional = Optional.ofNullable(itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
@@ -59,6 +61,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
     }
 
+    @Transactional
     @Override
     public BookingDto changeStatus(Long userId, Long bookingId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
@@ -74,6 +77,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public BookingDto getBooking(Long userId, Long bookingId) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -90,6 +94,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingDto;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<BookingDto> getAllBookingsByBooker(Long userId, String state) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -102,9 +107,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId).stream()
-                        .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
-                        .filter(booking -> booking.getEnd().isAfter(LocalDateTime.now())).collect(Collectors.toList());
+                bookings = bookingRepository.getBookingsByOwnerAndStatus_Current(userId);
                 break;
             case PAST:
                 bookings = bookingRepository.getBookingsByBookerId_OrderByStart_Past(userId);
@@ -123,6 +126,7 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(BookingMapper::mapToBookingDto).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<BookingDto> getAllBookingsByOwner(Long userId, String state) {
         userRepository.findById(userId).orElseThrow(() ->

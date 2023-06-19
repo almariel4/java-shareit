@@ -46,7 +46,7 @@ create table if not exists bookings (
   end_date timestamp without time zone default NULL,
   item_id bigint references items (id),
   booker_id bigint references users (id),
-  status status,
+  status status NOT NULL,
   constraint pk_id primary key (id)
 );
 

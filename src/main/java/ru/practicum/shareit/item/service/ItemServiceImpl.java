@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -33,6 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
+    @Transactional
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         Item item;
@@ -47,6 +49,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.mapToItemDto(itemRepository.save(item));
     }
 
+    @Transactional
     @Override
     public ItemDto editItem(Long userId, Long itemId, ItemDto itemDto) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -65,6 +68,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.mapToItemDto(itemRepository.save(item));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> getItemsByUser(Long userId) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -90,6 +94,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
+    @Transactional
     @Override
     public ItemDto getItem(Long userId, Long itemId) {
         userRepository.findById(userId).orElseThrow(() ->
@@ -103,6 +108,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> searchForItems(Long userId, String text) {
         List<ItemDto> items = new ArrayList<>();
@@ -112,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
         return items;
     }
 
-
+    @Transactional
     @Override
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         if (commentDto.getText().isBlank()) {
