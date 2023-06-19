@@ -107,7 +107,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.getBookingsByOwnerAndStatus_Current(userId);
+                bookings = bookingRepository.getBookingsByBookerId_OrderByStart_Current(userId);
                 break;
             case PAST:
                 bookings = bookingRepository.getBookingsByBookerId_OrderByStart_Past(userId);
@@ -140,9 +140,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId).stream()
-                        .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
-                        .filter(booking -> booking.getEnd().isAfter(LocalDateTime.now())).collect(Collectors.toList());
+                bookings = bookingRepository.getBookingsByOwnerAndStatus_Current(userId);
                 break;
             case PAST:
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Past(userId);
