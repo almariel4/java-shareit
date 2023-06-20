@@ -1,21 +1,40 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.BookingStatus;
+import lombok.*;
+import org.hibernate.annotations.Type;
+import ru.practicum.shareit.booking.enums.BookingStatus;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Entity
+@Table(name = "bookings")
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class Booking {
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "start_date")
     private LocalDateTime start;
+    @Column(name = "end_date")
     private LocalDateTime end;
-    private int item;
-    private int booker;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Item item;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User booker;
+    @Column(name = "booker_id", insertable = false, updatable = false)
+    private Long bookerId;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    @Type(type = "ru.practicum.shareit.booking.EnumTypePostgreSql")
     private BookingStatus status;
 }
