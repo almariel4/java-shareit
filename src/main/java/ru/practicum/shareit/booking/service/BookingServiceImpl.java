@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -96,15 +97,22 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingsByBooker(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByBooker(Long userId, String state, Long from, Long size) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
 
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
+
         List<Booking> bookings;
+        PageRequest pageRequest = createPageRequest(from, size);
+
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
+                if (pageRequest != null) {
+                    bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId, pageRequest);
+                } else {
+                    bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
+                }
                 break;
             case CURRENT:
                 bookings = bookingRepository.getBookingsByBookerId_OrderByStart_Current(userId);
@@ -128,16 +136,22 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingsByOwner(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByOwner(Long userId, String state, Long from, Long size) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
 
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
+
         List<Booking> bookings;
+        PageRequest pageRequest = createPageRequest (from, size);
 
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId);
+                if (pageRequest != null) {
+                    bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId, pageRequest);
+                } else {
+                    bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId);
+                }
                 break;
             case CURRENT:
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Current(userId);
@@ -146,7 +160,6 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Past(userId);
                 break;
             case FUTURE:
-                bookingRepository.getBookingsByOwnerAndStatus_Future(userId);
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Future(userId);
                 break;
             case WAITING:
@@ -158,6 +171,21 @@ public class BookingServiceImpl implements BookingService {
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream().map(BookingMapper::mapToBookingDto).collect(Collectors.toList());
+    }
+
+    PageRequest createPageRequest(Long from, Long size) {
+        PageRequest pageRequest = null;
+        if (from != null || size != null) {
+            if (from < 0 || size < 0) {
+                throw new BadRequestException("Индекс первого элемента и количество элементов не могут быть отрицательными");
+            }
+            if (from == 0 && size == 0) {
+                throw new BadRequestException("Нечего возвращать");
+            }
+            int pageNumber = (int) (from / size);
+            pageRequest = PageRequest.of(pageNumber, Math.toIntExact(size));
+        }
+        return pageRequest;
     }
 
 }
