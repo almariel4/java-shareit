@@ -1,11 +1,13 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -70,10 +72,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getItemsByUser(Long userId) {
+    public List<ItemDto> getItemsByUser(Long userId, Long from, Long size) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        List<Item> items = itemRepository.findItemsByOwnerOrderById(userId);
+
+        PageRequest pageRequest = BookingServiceImpl.createPageRequest(from, size);
+        List<Item> items;
+        if (pageRequest != null) {
+            items = itemRepository.findItemsByOwnerOrderById(userId, pageRequest);
+        } else {
+            items = itemRepository.findItemsByOwnerOrderById(userId);
+        }
         List<ItemDto> itemList = new ArrayList<>();
         for (Item item : items) {
             ItemDto itemDto = setBookings(userId, item);
@@ -110,10 +119,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> searchForItems(Long userId, String text) {
+    public List<ItemDto> searchForItems(Long userId, String text, Long from, Long size) {
         List<ItemDto> items = new ArrayList<>();
+        PageRequest pageRequest = BookingServiceImpl.createPageRequest(from, size);
         if (!text.isBlank()) {
-            items = itemRepository.search(text).stream().map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+            if (pageRequest != null) {
+                items = itemRepository.search(text).stream().map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+            } else {
+                items = itemRepository.search(text, pageRequest).stream()
+                        .map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+            }
         }
         return items;
     }

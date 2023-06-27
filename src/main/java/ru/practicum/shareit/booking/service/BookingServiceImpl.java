@@ -173,7 +173,7 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(BookingMapper::mapToBookingDto).collect(Collectors.toList());
     }
 
-    PageRequest createPageRequest(Long from, Long size) {
+    public static PageRequest createPageRequest(Long from, Long size) {
         PageRequest pageRequest = null;
         if (from != null || size != null) {
             if (from < 0 || size < 0) {
