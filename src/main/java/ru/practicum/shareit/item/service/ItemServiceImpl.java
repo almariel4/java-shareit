@@ -92,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
         return itemList;
     }
 
-    private ItemDto setBookings(Long userId, Item item) {
+    public ItemDto setBookings(Long userId, Item item) {
         ItemDto itemDto = ItemMapper.mapToItemDto(item);
         if (userId.equals(item.getOwner())) {
             Booking lastBooking = bookingRepository.getLastBooking(item.getId()).orElse(null);
@@ -153,7 +153,7 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException("Пользователь не может оставить комментарий к вещи");
         }
         Comment comment = CommentMapper.mapToComment(item, user, commentDto);
-        commentRepository.save(comment);
+//        commentRepository.save(comment);
         return CommentMapper.mapToCommentDto(commentRepository.save(comment));
     }
 

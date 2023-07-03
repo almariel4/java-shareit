@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         if (userDto.getName() != null && userDto.getEmail() != null) {
             user = userRepository.save(UserMapper.mapToUser(userDto));
         } else {
-            throw new BadRequestException("Не указано имя или email пользователя");
+            throw new BadRequestException("Не указано имя и email пользователя");
         }
         return UserMapper.mapToUserDto(user);
     }
@@ -65,5 +65,4 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getReferenceById(userId);
         userRepository.delete(user);
     }
-
 }

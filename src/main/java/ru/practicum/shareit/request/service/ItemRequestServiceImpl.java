@@ -70,7 +70,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             int pageNumber = (int) (from / size);
             Pageable pageable = PageRequest.of(pageNumber, Math.toIntExact(size));
             List<ItemRequest> itemRequests = itemRequestRepository.findAll(pageable).stream()
-                    .filter(itemRequest -> !itemRequest.getRequestor().getId().equals(userId))
+//                    .filter(itemRequest -> !itemRequest.getRequestor().getId().equals(userId))
                     .collect(Collectors.toList());
             itemRequestDtos = addItemToRequest(itemRequests);
         }
@@ -90,7 +90,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDto;
     }
 
-    private List<ItemRequestDto> addItemToRequest(List<ItemRequest> itemRequests) {
+//    Сделан public для юнит-тестирования
+    public List<ItemRequestDto> addItemToRequest(List<ItemRequest> itemRequests) {
         List<ItemRequestDto> itemRequestDtos = new ArrayList<>();
         for (ItemRequest itemRequest : itemRequests) {
             Optional<Item> item = itemRepository.getItemByRequestId(itemRequest.getId());
