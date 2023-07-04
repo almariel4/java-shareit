@@ -32,27 +32,27 @@ class UserServiceImplItTest {
     private final UserService userService;
     private final EntityManager em;
     private UserDto userDto;
-    private UserDto userDto_Kris;
+    private UserDto userDtoKris;
 
     @BeforeEach
     void setUp() {
         userDto = new UserDto(1L, "Anna", "test@test.ru");
-        userDto_Kris = new UserDto(2L, "Kristina", "testKristina@test.ru");
+        userDtoKris = new UserDto(2L, "Kristina", "testKristina@test.ru");
     }
 
     @Test
     void getAllUsers() {
         userService.createUser(userDto);
-        userService.createUser(userDto_Kris);
+        userService.createUser(userDtoKris);
 
         List<UserDto> users = userService.getAllUsers();
 
         assertThat(users.get(0).getId(), equalTo(userDto.getId()));
         assertThat(users.get(0).getName(), equalTo(userDto.getName()));
         assertThat(users.get(0).getEmail(), equalTo(userDto.getEmail()));
-        assertThat(users.get(1).getId(), equalTo(userDto_Kris.getId()));
-        assertThat(users.get(1).getName(), equalTo(userDto_Kris.getName()));
-        assertThat(users.get(1).getEmail(), equalTo(userDto_Kris.getEmail()));
+        assertThat(users.get(1).getId(), equalTo(userDtoKris.getId()));
+        assertThat(users.get(1).getName(), equalTo(userDtoKris.getName()));
+        assertThat(users.get(1).getEmail(), equalTo(userDtoKris.getEmail()));
     }
 
     @Test

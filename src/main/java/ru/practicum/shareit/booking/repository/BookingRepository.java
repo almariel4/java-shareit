@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> getBookingsByBookerId_OrderByStartDesc(Long userId);
-    
+
     List<Booking> getBookingsByBookerId_OrderByStartDesc(Long userId, PageRequest pageRequest);
 
     @Query("select b from Booking as b " +
