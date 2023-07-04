@@ -31,18 +31,18 @@ class ItemRequestServiceImplItTest {
     @Autowired
     private UserService userService;
     private User user;
-    private User user_Kris;
-    private UserDto userDto_Kris;
+    private User userKris;
+    private UserDto userDtoKris;
     private UserDto userDto;
     private ItemRequestDto itemRequestDto;
 
     @BeforeEach
     void setUp() {
         user = new User(1L, "Anna", "test@test.ru");
-        user_Kris = new User(2L, "Kristina", "testKristina@test.ru");
-        userDto_Kris = new UserDto(2L, "Kristina", "testKristina@test.ru");;
+        userKris = new User(2L, "Kristina", "testKristina@test.ru");
+        userDtoKris = new UserDto(2L, "Kristina", "testKristina@test.ru");;
         userDto = new UserDto(1L, "Anna", "test@test.ru");
-        itemRequestDto = new ItemRequestDto(1L, "Требуются качели для малышей", user_Kris, LocalDateTime.of(2023, 5, 23, 12, 0), new ArrayList<>());
+        itemRequestDto = new ItemRequestDto(1L, "Требуются качели для малышей", userKris, LocalDateTime.of(2023, 5, 23, 12, 0), new ArrayList<>());
     }
 
     @Test
@@ -71,8 +71,8 @@ class ItemRequestServiceImplItTest {
     @Test
     void getAllWithPagination() {
         userService.createUser(userDto);
-        userService.createUser(userDto_Kris);
-        itemRequestService.addItemRequest(user_Kris.getId(), itemRequestDto);
+        userService.createUser(userDtoKris);
+        itemRequestService.addItemRequest(userKris.getId(), itemRequestDto);
         List<ItemRequestDto> itemRequestDtoTestList = itemRequestService.getAllWithPagination(user.getId(), 0L, 20L);
 
         hasSize(1);

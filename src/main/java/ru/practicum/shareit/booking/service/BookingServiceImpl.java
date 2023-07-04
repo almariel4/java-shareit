@@ -143,7 +143,7 @@ public class BookingServiceImpl implements BookingService {
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
 
         List<Booking> bookings;
-        PageRequest pageRequest = createPageRequest (from, size);
+        PageRequest pageRequest = createPageRequest(from, size);
 
         switch (bookingState) {
             case ALL:

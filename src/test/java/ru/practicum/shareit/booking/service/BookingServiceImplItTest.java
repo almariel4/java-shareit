@@ -42,24 +42,24 @@ class BookingServiceImplItTest {
     private ItemDto itemDto;
     private User user;
     private UserDto userDto;
-    private User user_Kris;
-    private UserDto userDto_Kris;
+    private User userKris;
+    private UserDto userDtoKris;
 
     @BeforeEach
     void setUp() {
         user = new User(1L, "Anna", "test@test.ru");
         userDto = new UserDto(1L, "Anna", "test@test.ru");
-        user_Kris = new User(2L, "Kristina", "testKristina@test.ru");
-        userDto_Kris = new UserDto(2L, "Kristina", "testKristina@test.ru");
+        userKris = new User(2L, "Kristina", "testKristina@test.ru");
+        userDtoKris = new UserDto(2L, "Kristina", "testKristina@test.ru");
         item = new Item(1L, "Качели", "Качели для малышей", true, 2L, null);
         itemDto = new ItemDto(1L, "Качели", "Качели для малышей", true, null, null, null, new ArrayList<>());
         bookingDto = new BookingDto(1L,
                 LocalDateTime.of(2023, 5, 30, 12, 0),
                 LocalDateTime.of(2023, 7, 30, 12, 0),
-                item.getId(), item, user_Kris, user_Kris.getId(), BookingStatus.WAITING);
+                item.getId(), item, userKris, userKris.getId(), BookingStatus.WAITING);
 
         userService.createUser(userDto);
-        userService.createUser(userDto_Kris);
+        userService.createUser(userDtoKris);
         itemService.addItem(user.getId(), itemDto);
         bookingDto.setStart(LocalDateTime.now().plusMonths(2));
         bookingDto.setEnd(LocalDateTime.now().plusMonths(4));
@@ -67,7 +67,7 @@ class BookingServiceImplItTest {
 
     @Test
     void addBooking() {
-        bookingService.addBooking(user_Kris.getId(), bookingDto);
+        bookingService.addBooking(userKris.getId(), bookingDto);
 
         BookingDto bookingDtoTest = bookingService.getBooking(user.getId(), bookingDto.getId());
 
@@ -81,7 +81,7 @@ class BookingServiceImplItTest {
 
     @Test
     void changeStatus() {
-        bookingService.addBooking(user_Kris.getId(), bookingDto);
+        bookingService.addBooking(userKris.getId(), bookingDto);
         bookingService.changeStatus(user.getId(), bookingDto.getId(), true);
 
         BookingDto bookingDtoTest = bookingService.getBooking(user.getId(), bookingDto.getId());
@@ -91,7 +91,7 @@ class BookingServiceImplItTest {
 
     @Test
     void getBooking() {
-        bookingService.addBooking(user_Kris.getId(), bookingDto);
+        bookingService.addBooking(userKris.getId(), bookingDto);
         BookingDto bookingDtoTest = bookingService.getBooking(user.getId(), bookingDto.getId());
 
         assertThat(bookingDtoTest.getId(), equalTo(bookingDto.getId()));
@@ -104,9 +104,9 @@ class BookingServiceImplItTest {
 
     @Test
     void getAllBookingsByBooker() {
-        bookingService.addBooking(user_Kris.getId(), bookingDto);
+        bookingService.addBooking(userKris.getId(), bookingDto);
 
-        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByBooker(user_Kris.getId(), "ALL", 0L, 20L);
+        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByBooker(userKris.getId(), "ALL", 0L, 20L);
 
         assertThat(bookingDtoTest.get(0).getId(), equalTo(bookingDto.getId()));
         assertThat(bookingDtoTest.get(0).getStart(), equalTo(bookingDto.getStart()));
@@ -118,9 +118,9 @@ class BookingServiceImplItTest {
 
     @Test
     void getAllBookingsByOwner() {
-        bookingService.addBooking(user_Kris.getId(), bookingDto);
+        bookingService.addBooking(userKris.getId(), bookingDto);
 
-        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByOwner(user.getId(), "ALL", 0L, 20l);
+        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByOwner(user.getId(), "ALL", 0L, 20L);
 
         assertThat(bookingDtoTest.get(0).getId(), equalTo(bookingDto.getId()));
         assertThat(bookingDtoTest.get(0).getStart(), equalTo(bookingDto.getStart()));

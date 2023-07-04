@@ -33,12 +33,12 @@ class BookingRepositoryTest {
     private Booking bookingLater;
     private Item item;
     private User user;
-    private User user_Kris;
+    private User userKris;
 
     @BeforeEach
     void setUp() {
         user = new User(1L, "Anna", "test@test.ru");
-        user_Kris = new User(2L, "Kristina", "testKristina@test.ru");
+        userKris = new User(2L, "Kristina", "testKristina@test.ru");
         item = new Item(1L, "Качели", "Качели для малышей", true, 2L, null);
         booking = new Booking(1L,
                 LocalDateTime.of(2023, 6, 30, 12, 0),
@@ -49,7 +49,7 @@ class BookingRepositoryTest {
                 LocalDateTime.of(2023, 8, 30, 12, 0),
                 item, user, user.getId(), BookingStatus.WAITING);
         userRepository.save(user);
-        userRepository.save(user_Kris);
+        userRepository.save(userKris);
         itemRepository.save(item);
     }
 
@@ -139,7 +139,7 @@ class BookingRepositoryTest {
         bookingRepository.save(booking);
         bookingRepository.save(bookingLater);
 
-        List<Booking> bookings = bookingRepository.getBookingsByOwnerAndStatus_Future(user_Kris.getId());
+        List<Booking> bookings = bookingRepository.getBookingsByOwnerAndStatus_Future(userKris.getId());
 
         assertFalse(bookings.isEmpty());
         assertEquals(1, bookings.size());
@@ -152,7 +152,7 @@ class BookingRepositoryTest {
         bookingRepository.save(booking);
         bookingRepository.save(bookingLater);
 
-        List<Booking> bookings = bookingRepository.getBookingByOwnerAndStatus(user_Kris.getId(), BookingStatus.WAITING);
+        List<Booking> bookings = bookingRepository.getBookingByOwnerAndStatus(userKris.getId(), BookingStatus.WAITING);
 
         assertFalse(bookings.isEmpty());
         assertEquals(1, bookings.size());
@@ -167,7 +167,7 @@ class BookingRepositoryTest {
         bookingRepository.save(booking);
         bookingRepository.save(bookingLater);
 
-        Optional <Booking> booking = bookingRepository.getLastBooking(item.getId());
+        Optional<Booking> booking = bookingRepository.getLastBooking(item.getId());
 
         assertNotNull(booking);
     }
@@ -180,7 +180,7 @@ class BookingRepositoryTest {
         bookingRepository.save(booking);
         bookingRepository.save(bookingLater);
 
-        Optional <Booking> booking = bookingRepository.getNextBooking(item.getId());
+        Optional<Booking> booking = bookingRepository.getNextBooking(item.getId());
 
         assertNotNull(booking);
     }
