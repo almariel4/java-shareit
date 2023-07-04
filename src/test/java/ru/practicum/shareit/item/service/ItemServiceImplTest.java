@@ -15,9 +15,7 @@ import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -41,8 +39,6 @@ class ItemServiceImplTest {
     private UserRepository userRepository;
     @Mock
     private BookingRepository bookingRepository;
-    @Mock
-    private CommentRepository commentRepository;
     @InjectMocks
     private ItemServiceImpl itemService;
 
@@ -50,7 +46,6 @@ class ItemServiceImplTest {
     private Item item;
     private ItemDto itemDto;
     private CommentDto commentDto;
-    private Comment comment;
     private Booking booking;
 
     @BeforeEach
@@ -279,22 +274,6 @@ class ItemServiceImplTest {
         assertNull(itemDtoTest.getNextBooking());
     }
 
-/*    @Test
-    void searchForItems_whenPageRequestIsNotNull_thenReturnListOfItemDto() {
-        when(userRepository.save(any())).thenReturn(user);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(itemRepository.save(any())).thenReturn(item);
-        when(itemRepository.search(anyString(), PageRequest.of(0, 1))).thenReturn(List.of(item));
-
-        userRepository.save(user);
-        itemService.addItem(user.getId(), itemDto);
-
-        List<ItemDto> itemDtos = itemService.searchForItems(user.getId(), "Качели", null, null);
-
-        assertEquals(1, itemDtos.size());
-        assertEquals(1L, itemDtos.get(0).getId());
-    }*/
-
     @Test
     void searchForItems_whenPageRequestIsNull_thenReturnListOfItemDto() {
         when(itemRepository.search(anyString())).thenReturn(List.of(item));
@@ -346,28 +325,4 @@ class ItemServiceImplTest {
 
         assertEquals("Пользователь не может оставить комментарий к вещи", thrown.getMessage());
     }
-
-/*    @Test
-    void addComment_whenItemIsValidated_thenReturnedItemDto() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(itemRepository.findById(anyLong())).thenReturn(Optional.ofNullable(item));
-        when(bookingRepository.save(any())).thenReturn(booking);
-        when(commentRepository.save(any())).thenReturn(comment);
-        when(bookingRepository.getBookingsByBookerId_OrderByStartDesc(user.getId())).thenReturn(List.of(booking));
-
-        booking.setStart(LocalDateTime.now().minusDays(4));
-        booking.setEnd(LocalDateTime.now().minusDays(2));
-        booking.setStatus(BookingStatus.APPROVED);
-        booking.getItem().setId(item.getId());
-
-        bookingRepository.save(booking);
-
-        CommentDto commentDtoTest = itemService.addComment(user.getId(), item.getId(), commentDto);
-
-        assertEquals(commentDto.getText(), commentDtoTest.getText());
-        assertEquals(commentDto.getItem(), commentDtoTest.getItem());
-        assertEquals(commentDto.getAuthorName(), commentDtoTest.getAuthorName());
-        assertEquals(commentDto.getCreated(), commentDtoTest.getCreated());
-    }*/
-
 }

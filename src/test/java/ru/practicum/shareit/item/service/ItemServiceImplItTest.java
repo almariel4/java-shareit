@@ -38,15 +38,8 @@ class ItemServiceImplItTest {
     @BeforeEach
     void setUp() {
         userDto = new UserDto(1L, "Anna", "test@test.ru");
-//        User user = new User(1L, "Anna", "test@test.ru");
         itemDto = new ItemDto(1L, "Качели", "Качели для малышей", true, null, null, null, new ArrayList<>());
         item = new Item(1L, "Качели", "Качели для малышей", true, 2L, 1L);
-/*        BookingDto bookingDto = new BookingDto(1L,
-                LocalDateTime.now().minusDays(2),
-                LocalDateTime.of(2023, 7, 30, 12, 0),
-                item.getId(), item, user, user.getId(), BookingStatus.APPROVED);
-        CommentDto commentDto = new CommentDto(1L, "Отличные качели", itemDto.getId(), userDto.getName(),
-                LocalDateTime.of(2023, 5, 30, 12, 0));*/
     }
 
     @Test

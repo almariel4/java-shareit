@@ -14,7 +14,6 @@ create table if not exists requests (
     description VARCHAR(512) NOT NULL,
     requestor_id bigint references users(id),
     created timestamp without time zone,
---    item_id bigint references items(id),
     constraint pk_request primary key (id)
 );
 

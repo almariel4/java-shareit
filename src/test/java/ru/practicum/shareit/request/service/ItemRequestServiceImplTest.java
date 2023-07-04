@@ -143,25 +143,6 @@ class ItemRequestServiceImplTest {
         assertEquals("Нечего возвращать", thrown.getMessage());
     }
 
-/*    @Test
-    void getAllWithPagination_whenFromAndSizeValid_thenReturnListOfItemRequestDtoWithPagination() {
-        Page page = Mockito.mock(Page.class);
-        when(userRepository.save(any())).thenReturn(user);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(itemRequestRepository.save(any())).thenReturn(itemRequest);
-        when(itemRequestRepository.findAll(any(Pageable.class))).thenReturn(page);
-
-        userRepository.save(user);
-        itemRequestService.addItemRequest(user.getId(), itemRequestDto);
-        List<ItemRequestDto> itemRequestDtos = itemRequestService.getAllWithPagination(user.getId(), 0L, 20L);
-
-        assertEquals(itemRequestDto.getId(), itemRequestDtos.get(0).getId());
-        assertEquals(itemRequestDto.getDescription(), itemRequestDtos.get(0).getDescription());
-        assertEquals(itemRequestDto.getRequestor(), itemRequestDtos.get(0).getRequestor());
-        assertEquals(itemRequestDto.getCreated(), itemRequestDtos.get(0).getCreated());
-        assertEquals(itemRequestDto.getItems().size(), itemRequestDtos.get(0).getItems().size());
-    }*/
-
     @Test
     void getItemRequest_whenUserNotFound_thenThrowNotFoundException() {
         NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
@@ -179,26 +160,6 @@ class ItemRequestServiceImplTest {
         });
         assertEquals("Запрос с id = " + itemRequest.getId() + " не найден", thrown.getMessage());
     }
-/*
-    @Test
-    void getItemRequest_whenItemRequestExistsWithoutItems_thenReturnedItemRequestDtoWithoutItems() {
-        when(userRepository.save(any())).thenReturn(user);
-        when(itemRequestRepository.save(any())).thenReturn(itemRequest);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-        when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.ofNullable(itemRequest));
-        when(itemRepository.getItemByRequestId(anyLong())).thenReturn(Optional.of(item));
-
-        userRepository.save(user);
-        itemRequestRepository.save(itemRequest);
-
-        ItemRequestDto itemRequestDtoTest = itemRequestService.getItemRequest(user.getId(), itemRequest.getId());
-
-        assertEquals(itemRequestDto.getId(), itemRequestDtoTest.getId());
-        assertEquals(itemRequestDto.getDescription(), itemRequestDtoTest.getDescription());
-        assertEquals(itemRequestDto.getRequestor(), itemRequestDtoTest.getRequestor());
-        assertEquals(itemRequestDto.getCreated(), itemRequestDtoTest.getCreated());
-        assertEquals(itemRequestDto.getItems().size(), itemRequestDtoTest.getItems().size());
-    }*/
 
     @Test
     void getItemRequest_whenItemRequestExistsWithItems_thenReturnedItemRequestDtoWithItems() {
@@ -218,15 +179,6 @@ class ItemRequestServiceImplTest {
         assertEquals(itemRequestDto.getCreated(), itemRequestDtoTest.getCreated());
         assertEquals(itemRequestDto.getItems().size(), itemRequestDtoTest.getItems().size());
     }
-
-/*    @Test
-    void addItemToRequest_whenItemRequestExistsWithItems_thenReturnedListOfItemRequestDtoWithoutItems() {
-        when(itemRepository.getItemByRequestId(itemRequest.getId())).thenReturn(Optional.of(null));
-
-        List<ItemRequestDto> itemRequestDtos = itemRequestService.addItemToRequest(List.of(itemRequest));
-
-        assertEquals(0, itemRequestDtos.size());
-    }*/
 
     @Test
     void addItemToRequest_whenItemRequestExistsWithItems_thenReturnedListOfItemRequestDtoWithItems() {

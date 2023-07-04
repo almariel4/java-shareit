@@ -180,10 +180,6 @@ class ItemControllerTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
-/*                .andExpect(jsonPath("$.text", is(commentDto.getText())))
-                .andExpect((jsonPath("$.item", is(commentDto.getItem()))))
-                .andExpect((jsonPath("$.authorName", is(commentDto.getAuthorName()))))
-                .andExpect((jsonPath("$.created", is(commentDto.getCreated()))));*/
 
         assertEquals(objectMapper.writeValueAsString(commentDto), response);
         verify(itemService, times(1)).addComment(user.getId(), itemDto.getId(), commentDto);
