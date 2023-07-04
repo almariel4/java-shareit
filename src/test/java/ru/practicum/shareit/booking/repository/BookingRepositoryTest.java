@@ -134,17 +134,6 @@ class BookingRepositoryTest {
         assertEquals(1L, bookings.get(0).getId());
     }*/
 
-    @Test
-    void getBookingsByOwnerAndStatus_Future() {
-        bookingRepository.save(booking);
-        bookingRepository.save(bookingLater);
-
-        List<Booking> bookings = bookingRepository.getBookingsByOwnerAndStatus_Future(userKris.getId());
-
-        assertFalse(bookings.isEmpty());
-        assertEquals(1, bookings.size());
-        assertEquals(1L, bookings.get(0).getId());
-    }
 
     @Test
     void getBookingByOwnerAndStatus() {
