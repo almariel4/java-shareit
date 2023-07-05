@@ -174,7 +174,7 @@ class ItemServiceImplTest {
     @Test
     void getItemsByUser_whenUserNotFound_thenThrowNotFoundException() {
         NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
-            itemService.getItemsByUser(user.getId(), 0L, 20L);
+            itemService.getItemsByUser(user.getId(), PageRequest.of(0, 20));
         });
 
         assertEquals("Пользователь с id = " + user.getId() + " не найден", thrown.getMessage());
@@ -189,7 +189,7 @@ class ItemServiceImplTest {
 
         userRepository.save(user);
         itemRepository.save(item);
-        List<ItemDto> items = itemService.getItemsByUser(user.getId(), 0L, 20L);
+        List<ItemDto> items = itemService.getItemsByUser(user.getId(), PageRequest.of(0, 20));
 
         assertEquals(1L, items.get(0).getId());
         assertEquals("Качели", items.get(0).getName());
@@ -209,7 +209,7 @@ class ItemServiceImplTest {
 
         userRepository.save(user);
         itemRepository.save(item);
-        List<ItemDto> items = itemService.getItemsByUser(user.getId(), null, null);
+        List<ItemDto> items = itemService.getItemsByUser(user.getId(), null);
 
         assertEquals(1L, items.get(0).getId());
         assertEquals("Качели", items.get(0).getName());
@@ -283,7 +283,7 @@ class ItemServiceImplTest {
     void searchForItems_whenPageRequestIsNull_thenReturnListOfItemDto() {
         when(itemRepository.search(anyString())).thenReturn(List.of(item));
 
-        List<ItemDto> itemDtos = itemService.searchForItems(user.getId(), "Качели", 0L, 20L);
+        List<ItemDto> itemDtos = itemService.searchForItems(user.getId(), "Качели", PageRequest.of(0, 20));
 
         assertEquals(1, itemDtos.size());
         assertEquals(1L, itemDtos.get(0).getId());

@@ -96,7 +96,7 @@ class ItemRequestControllerTest {
     @SneakyThrows
     @Test
     void getAllWithPagination() {
-        when(itemRequestService.getAllWithPagination(anyLong(), anyLong(), anyLong())).thenReturn(List.of(itemRequestDto));
+        when(itemRequestService.getAllWithPagination(anyLong(), any())).thenReturn(List.of(itemRequestDto));
 
         mockMvc.perform(get("/requests/all")
                         .header(header, 1L)

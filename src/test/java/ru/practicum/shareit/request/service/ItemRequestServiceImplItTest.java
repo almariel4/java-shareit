@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.request.model.ItemRequestDto;
@@ -42,7 +43,8 @@ class ItemRequestServiceImplItTest {
         userKris = new User(2L, "Kristina", "testKristina@test.ru");
         userDtoKris = new UserDto(2L, "Kristina", "testKristina@test.ru");;
         userDto = new UserDto(1L, "Anna", "test@test.ru");
-        itemRequestDto = new ItemRequestDto(1L, "Требуются качели для малышей", userKris, LocalDateTime.of(2023, 5, 23, 12, 0), new ArrayList<>());
+        itemRequestDto = new ItemRequestDto(1L, "Требуются качели для малышей", userKris,
+                LocalDateTime.of(2023, 5, 23, 12, 0), new ArrayList<>());
     }
 
     @Test
@@ -73,7 +75,7 @@ class ItemRequestServiceImplItTest {
         userService.createUser(userDto);
         userService.createUser(userDtoKris);
         itemRequestService.addItemRequest(userKris.getId(), itemRequestDto);
-        List<ItemRequestDto> itemRequestDtoTestList = itemRequestService.getAllWithPagination(user.getId(), 0L, 20L);
+        List<ItemRequestDto> itemRequestDtoTestList = itemRequestService.getAllWithPagination(user.getId(), PageRequest.of(0, 20));
 
         hasSize(1);
         assertThat(itemRequestDtoTestList.get(0).getId(), equalTo(itemRequestDto.getId()));

@@ -107,7 +107,7 @@ class ItemControllerTest {
     @SneakyThrows
     @Test
     void getItemsByUser_whenUserIsValidated_thenReturnListOfItems() {
-        when(itemService.getItemsByUser(anyLong(), anyLong(), anyLong())).thenReturn(List.of(itemDto));
+        when(itemService.getItemsByUser(anyLong(), any())).thenReturn(List.of(itemDto));
 
         mockMvc.perform(get("/items")
                         .header(header, 1L)
@@ -146,7 +146,7 @@ class ItemControllerTest {
     @SneakyThrows
     @Test
     void searchForItems_whenSearchTextIsNotBlank_ThenReturnListOfItems() {
-        when(itemService.searchForItems(anyLong(), anyString(), anyLong(), anyLong())).thenReturn(List.of(itemDto));
+        when(itemService.searchForItems(anyLong(), anyString(), any())).thenReturn(List.of(itemDto));
 
         mockMvc.perform(get("/items/search")
                         .header(header, 1L)

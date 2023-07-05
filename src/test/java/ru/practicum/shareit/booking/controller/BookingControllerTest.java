@@ -115,7 +115,7 @@ class BookingControllerTest {
     @SneakyThrows
     @Test
     void getAllBookingsByBooker() {
-        when(bookingService.getAllBookingsByBooker(anyLong(), anyString(), anyLong(), anyLong())).thenReturn(List.of(bookingDto));
+        when(bookingService.getAllBookingsByBooker(anyLong(), anyString(), any())).thenReturn(List.of(bookingDto));
 
         mockMvc.perform(get("/bookings")
                         .header(header, 1L)
@@ -134,7 +134,7 @@ class BookingControllerTest {
     @SneakyThrows
     @Test
     void getAllBookingsByOwner() {
-        when(bookingService.getAllBookingsByOwner(anyLong(), anyString(), anyLong(), anyLong())).thenReturn(List.of(bookingDto));
+        when(bookingService.getAllBookingsByOwner(anyLong(), anyString(), any())).thenReturn(List.of(bookingDto));
 
         mockMvc.perform(get("/bookings/owner")
                         .header(header, 1L)

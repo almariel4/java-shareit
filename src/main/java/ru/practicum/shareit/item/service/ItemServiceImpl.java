@@ -1,13 +1,12 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -72,14 +71,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getItemsByUser(Long userId, Long from, Long size) {
+    public List<ItemDto> getItemsByUser(Long userId, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
 
-        PageRequest pageRequest = BookingServiceImpl.createPageRequest(from, size);
         List<Item> items;
-        if (pageRequest != null) {
-            items = itemRepository.findItemsByOwnerOrderById(userId, pageRequest);
+        if (pageable != null) {
+            items = itemRepository.findItemsByOwnerOrderById(userId, pageable);
         } else {
             items = itemRepository.findItemsByOwnerOrderById(userId);
         }
@@ -119,14 +117,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> searchForItems(Long userId, String text, Long from, Long size) {
+    public List<ItemDto> searchForItems(Long userId, String text, Pageable pageable) {
         List<ItemDto> items = new ArrayList<>();
-        PageRequest pageRequest = BookingServiceImpl.createPageRequest(from, size);
         if (!text.isBlank()) {
-            if (pageRequest != null) {
+            if (pageable != null) {
                 items = itemRepository.search(text).stream().map(ItemMapper::mapToItemDto).collect(Collectors.toList());
             } else {
-                items = itemRepository.search(text, pageRequest).stream()
+                items = itemRepository.search(text, pageable).stream()
                         .map(ItemMapper::mapToItemDto).collect(Collectors.toList());
             }
         }
@@ -153,7 +150,6 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException("Пользователь не может оставить комментарий к вещи");
         }
         Comment comment = CommentMapper.mapToComment(item, user, commentDto);
-//        commentRepository.save(comment);
         return CommentMapper.mapToCommentDto(commentRepository.save(comment));
     }
 

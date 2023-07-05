@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -85,7 +86,7 @@ class ItemServiceImplItTest {
         userService.createUser(userDto);
         itemService.addItem(userDto.getId(), itemDto);
 
-        List<ItemDto> itemDtoTestList = itemService.getItemsByUser(userDto.getId(), 0L, 20L);
+        List<ItemDto> itemDtoTestList = itemService.getItemsByUser(userDto.getId(), PageRequest.of(0, 20));
 
         assertThat(itemDtoTestList.get(0).getId(), equalTo(itemDto.getId()));
         assertThat(itemDtoTestList.get(0).getName(), equalTo(itemDto.getName()));
@@ -118,7 +119,7 @@ class ItemServiceImplItTest {
         userService.createUser(userDto);
         itemService.addItem(userDto.getId(), itemDto);
 
-        List<ItemDto> itemDtoTestList = itemService.searchForItems(userDto.getId(), "Качели", 0L, 20L);
+        List<ItemDto> itemDtoTestList = itemService.searchForItems(userDto.getId(), "Качели", PageRequest.of(0, 20));
 
         assertThat(itemDtoTestList.get(0).getId(), equalTo(itemDto.getId()));
         assertThat(itemDtoTestList.get(0).getName(), equalTo(itemDto.getName()));

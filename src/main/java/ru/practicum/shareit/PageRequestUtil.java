@@ -1,0 +1,22 @@
+package ru.practicum.shareit;
+
+import org.springframework.data.domain.PageRequest;
+import ru.practicum.shareit.exceptions.BadRequestException;
+
+public class PageRequestUtil {
+
+    public static PageRequest createPageRequest(Long from, Long size) {
+        PageRequest pageRequest = null;
+        if (from != null || size != null) {
+            if (from < 0 || size < 0) {
+                throw new BadRequestException("Индекс первого элемента и количество элементов не могут быть отрицательными");
+            }
+            if (from == 0 && size == 0) {
+                throw new BadRequestException("Нечего возвращать");
+            }
+            int pageNumber = (int) (from / size);
+            pageRequest = PageRequest.of(pageNumber, Math.toIntExact(size));
+        }
+        return pageRequest;
+    }
+}
