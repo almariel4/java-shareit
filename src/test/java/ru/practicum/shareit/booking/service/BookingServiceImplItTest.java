@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -106,7 +107,7 @@ class BookingServiceImplItTest {
     void getAllBookingsByBooker() {
         bookingService.addBooking(userKris.getId(), bookingDto);
 
-        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByBooker(userKris.getId(), "ALL", 0L, 20L);
+        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByBooker(userKris.getId(), "ALL", PageRequest.of(0, 20));
 
         assertThat(bookingDtoTest.get(0).getId(), equalTo(bookingDto.getId()));
         assertThat(bookingDtoTest.get(0).getStart(), equalTo(bookingDto.getStart()));
@@ -120,7 +121,7 @@ class BookingServiceImplItTest {
     void getAllBookingsByOwner() {
         bookingService.addBooking(userKris.getId(), bookingDto);
 
-        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByOwner(user.getId(), "ALL", 0L, 20L);
+        List<BookingDto> bookingDtoTest = bookingService.getAllBookingsByOwner(user.getId(), "ALL", PageRequest.of(0, 20));
 
         assertThat(bookingDtoTest.get(0).getId(), equalTo(bookingDto.getId()));
         assertThat(bookingDtoTest.get(0).getStart(), equalTo(bookingDto.getStart()));

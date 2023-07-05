@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -94,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingsByBooker(Long userId, String state, Long from, Long size) {
+    public List<BookingDto> getAllBookingsByBooker(Long userId, String state, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         if (state != null && state.equals("UNSUPPORTED")) {
@@ -102,12 +102,11 @@ public class BookingServiceImpl implements BookingService {
         }
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
         List<Booking> bookings;
-        PageRequest pageRequest = createPageRequest(from, size);
 
         switch (bookingState) {
             case ALL:
-                if (pageRequest != null) {
-                    bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId, pageRequest);
+                if (pageable != null) {
+                    bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId, pageable);
                 } else {
                     bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
                 }
@@ -134,7 +133,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingsByOwner(Long userId, String state, Long from, Long size) {
+    public List<BookingDto> getAllBookingsByOwner(Long userId, String state, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         if (state != null && state.equals("UNSUPPORTED")) {
@@ -143,12 +142,11 @@ public class BookingServiceImpl implements BookingService {
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
 
         List<Booking> bookings;
-        PageRequest pageRequest = createPageRequest(from, size);
 
         switch (bookingState) {
             case ALL:
-                if (pageRequest != null) {
-                    bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId, pageRequest);
+                if (pageable != null) {
+                    bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId, pageable);
                 } else {
                     bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId);
                 }
@@ -171,21 +169,6 @@ public class BookingServiceImpl implements BookingService {
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookings.stream().map(BookingMapper::mapToBookingDto).collect(Collectors.toList());
-    }
-
-    public static PageRequest createPageRequest(Long from, Long size) {
-        PageRequest pageRequest = null;
-        if (from != null || size != null) {
-            if (from < 0 || size < 0) {
-                throw new BadRequestException("Индекс первого элемента и количество элементов не могут быть отрицательными");
-            }
-            if (from == 0 && size == 0) {
-                throw new BadRequestException("Нечего возвращать");
-            }
-            int pageNumber = (int) (from / size);
-            pageRequest = PageRequest.of(pageNumber, Math.toIntExact(size));
-        }
-        return pageRequest;
     }
 
 }

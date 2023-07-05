@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,19 +55,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemRequestDto> getAllWithPagination(Long userId, Long from, Long size) {
+    public List<ItemRequestDto> getAllWithPagination(Long userId, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
         List<ItemRequestDto> itemRequestDtos = new ArrayList<>();
-        if (from != null || size != null) {
-            if (from < 0 || size < 0) {
-                throw new BadRequestException("Индекс первого элемента и количество элементов не могут быть отрицательными");
-            }
-            if (from == 0 && size == 0) {
-                throw new BadRequestException("Нечего возвращать");
-            }
-            int pageNumber = (int) (from / size);
-            Pageable pageable = PageRequest.of(pageNumber, Math.toIntExact(size));
+        if (pageable != null) {
             List<ItemRequest> itemRequests = itemRequestRepository.findAll(pageable).stream()
                     .filter(itemRequest -> !itemRequest.getRequestor().getId().equals(userId))
                     .collect(Collectors.toList());

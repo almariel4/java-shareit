@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import static ru.practicum.shareit.PageRequestUtil.createPageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
@@ -288,7 +289,7 @@ class BookingServiceImplTest {
     @Test
     void getAllBookingsByBooker_whenUserNotFound_thenThrowNotFoundException() {
         NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
-            bookingService.getAllBookingsByBooker(user.getId(), null, null, null);
+            bookingService.getAllBookingsByBooker(user.getId(), null, null);
         });
 
         assertEquals("Пользователь с id = " + user.getId() + " не найден", thrown.getMessage());
@@ -300,7 +301,7 @@ class BookingServiceImplTest {
         when(bookingRepository.getBookingsByBookerId_OrderByStartDesc(anyLong(), any())).thenReturn(List.of(booking));
 
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), null, 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), null, PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -314,7 +315,7 @@ class BookingServiceImplTest {
         when(bookingRepository.getBookingsByBookerId_OrderByStartDesc(anyLong())).thenReturn(List.of(booking));
 
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), null, null, null);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), null, null);
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -328,7 +329,7 @@ class BookingServiceImplTest {
         when(bookingRepository.getBookingsByBookerId_OrderByStartDesc(anyLong(), any())).thenReturn(List.of(booking));
 
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), null, 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), null, PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -344,7 +345,7 @@ class BookingServiceImplTest {
         bookingDto.setStart(LocalDateTime.now().minusDays(2));
         bookingRepository.save(booking);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "CURRENT", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "CURRENT", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -362,7 +363,7 @@ class BookingServiceImplTest {
         bookingDto.setEnd(LocalDateTime.now().minusDays(1));
         bookingRepository.save(booking);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "PAST", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "PAST", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -380,7 +381,7 @@ class BookingServiceImplTest {
         bookingDto.setEnd(LocalDateTime.now().plusDays(3));
         bookingRepository.save(booking);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "FUTURE", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "FUTURE", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -395,7 +396,7 @@ class BookingServiceImplTest {
         when(bookingRepository.getBookingsByBookerId_OrderByBookerId(anyLong(), any())).thenReturn(List.of(booking));
 
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "WAITING", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "WAITING", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -412,7 +413,7 @@ class BookingServiceImplTest {
         booking.setStatus(BookingStatus.REJECTED);
         bookingRepository.save(booking);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "REJECTED", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByBooker(user.getId(), "REJECTED", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -425,7 +426,7 @@ class BookingServiceImplTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
 
         UnsupportedStatusException thrown = Assertions.assertThrows(UnsupportedStatusException.class, () -> {
-            bookingService.getAllBookingsByBooker(user.getId(), "UNSUPPORTED", null, null);
+            bookingService.getAllBookingsByBooker(user.getId(), "UNSUPPORTED", null);
         });
 
         assertEquals("Unknown state: UNSUPPORTED_STATUS", thrown.getMessage());
@@ -434,7 +435,7 @@ class BookingServiceImplTest {
     @Test
     void getAllBookingsByOwner_whenUserNotFound_thenThrowNotFoundException() {
         NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
-            bookingService.getAllBookingsByOwner(user.getId(), null, null, null);
+            bookingService.getAllBookingsByOwner(user.getId(), null, null);
         });
 
         assertEquals("Пользователь с id = " + user.getId() + " не найден", thrown.getMessage());
@@ -448,7 +449,7 @@ class BookingServiceImplTest {
 
         bookingDto.getItem().setId(item.getId());
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), null, 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), null, PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -464,7 +465,7 @@ class BookingServiceImplTest {
 
         bookingDto.getItem().setId(item.getId());
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), null, null, null);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), null, null);
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -480,7 +481,7 @@ class BookingServiceImplTest {
 
         bookingDto.getItem().setId(item.getId());
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), null, 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), null, PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -498,7 +499,7 @@ class BookingServiceImplTest {
         bookingDto.setEnd(LocalDateTime.now().plusDays(2));
         bookingDto.getItem().setId(item.getId());
         bookingRepository.save(booking);
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "CURRENT", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "CURRENT", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -517,7 +518,7 @@ class BookingServiceImplTest {
         bookingDto.getItem().setId(item.getId());
         bookingRepository.save(booking);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "PAST", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "PAST", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -537,7 +538,7 @@ class BookingServiceImplTest {
         bookingDto.getItem().setId(item.getId());
         bookingService.addBooking(user.getId(), bookingDto);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "FUTURE", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "FUTURE", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -557,7 +558,7 @@ class BookingServiceImplTest {
         bookingDto.getItem().setId(item.getId());
         bookingService.addBooking(user.getId(), bookingDto);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "WAITING", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "WAITING", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -580,7 +581,7 @@ class BookingServiceImplTest {
         bookingService.addBooking(user.getId(), bookingDto);
         bookingService.changeStatus(2L, bookingDto.getId(), false);
 
-        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "REJECTED", 0L, 20L);
+        List<BookingDto> bookingDtos = bookingService.getAllBookingsByOwner(user.getId(), "REJECTED", PageRequest.of(0, 20));
 
         assertEquals(1L, bookingDtos.get(0).getId());
         assertEquals(user, bookingDtos.get(0).getBooker());
@@ -594,7 +595,7 @@ class BookingServiceImplTest {
 
         user.setId(2L);
         UnsupportedStatusException thrown = Assertions.assertThrows(UnsupportedStatusException.class, () -> {
-            bookingService.getAllBookingsByBooker(user.getId(), "UNSUPPORTED", null, null);
+            bookingService.getAllBookingsByBooker(user.getId(), "UNSUPPORTED", null);
         });
 
         assertEquals("Unknown state: UNSUPPORTED_STATUS", thrown.getMessage());
@@ -602,7 +603,7 @@ class BookingServiceImplTest {
 
     @Test
     void createPageRequest_whenFromOrSizeNull_thenReturnedPageRequestNull() {
-        PageRequest pageRequest = BookingServiceImpl.createPageRequest(null, null);
+        PageRequest pageRequest = createPageRequest(null, null);
 
         assertNull(pageRequest);
     }
@@ -610,7 +611,7 @@ class BookingServiceImplTest {
     @Test
     void createPageRequest_whenFromOrSizeLessZero_thenThrownBadRequestException() {
         BadRequestException thrown = Assertions.assertThrows(BadRequestException.class, () -> {
-            BookingServiceImpl.createPageRequest(-1L, 10L);
+            createPageRequest(-1L, 10L);
         });
 
         assertEquals("Индекс первого элемента и количество элементов не могут быть отрицательными", thrown.getMessage());
@@ -619,7 +620,7 @@ class BookingServiceImplTest {
     @Test
     void createPageRequest_whenFromOrSizeEqualZero_thenThrownBadRequestException() {
         BadRequestException thrown = Assertions.assertThrows(BadRequestException.class, () -> {
-            BookingServiceImpl.createPageRequest(0L, 0L);
+            createPageRequest(0L, 0L);
         });
 
         assertEquals("Нечего возвращать", thrown.getMessage());
@@ -630,7 +631,7 @@ class BookingServiceImplTest {
         int pageNumber = (int) (1L / 20L);
         PageRequest pageRequestTest = PageRequest.of(pageNumber, Math.toIntExact(20L));
 
-        PageRequest pageRequest = BookingServiceImpl.createPageRequest(1L, 20L);
+        PageRequest pageRequest = createPageRequest(1L, 20L);
 
         assertEquals(pageRequestTest, pageRequest);
     }

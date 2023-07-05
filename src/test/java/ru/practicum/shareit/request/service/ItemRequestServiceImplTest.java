@@ -116,31 +116,9 @@ class ItemRequestServiceImplTest {
     @Test
     void getAllWithPagination_whenUserNotFound_thenThrowNotFoundException() {
         NotFoundException thrown = Assertions.assertThrows(NotFoundException.class, () -> {
-            itemRequestService.getAllWithPagination(user.getId(), null, null);
+            itemRequestService.getAllWithPagination(user.getId(), null);
         });
         assertEquals("Пользователь с id = " + user.getId() + " не найден", thrown.getMessage());
-    }
-
-    @Test
-    void getAllWithPagination_whenFromOrSizeLessZero_thenThrowBadRequestException() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-
-        BadRequestException thrown = Assertions.assertThrows(BadRequestException.class, () -> {
-            itemRequestService.getAllWithPagination(user.getId(), -1L, 10L);
-        });
-        assertEquals("Индекс первого элемента и количество элементов не могут быть отрицательными", thrown.getMessage());
-    }
-
-    @Test
-    void getAllWithPagination_whenFromAndSizeEqualsZero_thenThrowBadRequestException() {
-        when(userRepository.save(any())).thenReturn(user);
-        when(userRepository.findById(anyLong())).thenReturn(Optional.ofNullable(user));
-
-        userRepository.save(user);
-        BadRequestException thrown = Assertions.assertThrows(BadRequestException.class, () -> {
-            itemRequestService.getAllWithPagination(user.getId(), 0L, 0L);
-        });
-        assertEquals("Нечего возвращать", thrown.getMessage());
     }
 
     @Test
