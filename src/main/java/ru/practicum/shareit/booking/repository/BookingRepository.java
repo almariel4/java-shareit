@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,13 +13,14 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-
     List<Booking> getBookingsByBookerId_OrderByStartDesc(Long userId);
+
+    List<Booking> getBookingsByBookerId_OrderByStartDesc(Long userId, Pageable pageable);
 
     @Query("select b from Booking as b " +
             "where b.booker.id = ?1 " +
             "and current_timestamp between b.start and b.end " +
-            "order by b.start desc")
+            "order by b.start ")
     List<Booking> getBookingsByBookerId_OrderByStart_Current(Long userId);
 
     @Query("select b from Booking as b " +
@@ -40,6 +42,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> getBookingsByBookerId_OrderByBookerId(Long userId, BookingStatus status);
 
     List<Booking> getBookingsByItemOwnerOrderByStartDesc(Long userId);
+
+    List<Booking> getBookingsByItemOwnerOrderByStartDesc(Long userId, Pageable pageable);
+
 
     @Query("select b from Booking as b " +
             "where b.item.owner = ?1 " +
@@ -80,4 +85,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "order by b.start_date " +
             "limit 1")
     Optional<Booking> getNextBooking(Long itemId);
+
 }

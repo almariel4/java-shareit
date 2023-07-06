@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -48,14 +49,11 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException("Должны быть заполнены дата начала и дата окончания бронирования");
         }
         if (bookingDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Дата начала бронирования должна быть раньше текущей даты и времени");
+            throw new BadRequestException("Дата начала бронирования не должна быть раньше текущей даты и времени");
         }
         if (bookingDto.getStart().isAfter(bookingDto.getEnd())
                 || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
             throw new BadRequestException("Дата окончания бронирования не должна быть позже даты начала");
-        }
-        if (item.getAvailable().equals(false)) {
-            throw new BadRequestException("Вещь недоступна для бронирования");
         }
         Booking booking = BookingMapper.mapToBooking(bookingDto, item, user);
         return BookingMapper.mapToBookingDto(bookingRepository.save(booking));
@@ -96,15 +94,22 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingsByBooker(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByBooker(Long userId, String state, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
-
+        if (state != null && state.equals("UNSUPPORTED")) {
+            throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+        }
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
         List<Booking> bookings;
+
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
+                if (pageable != null) {
+                    bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId, pageable);
+                } else {
+                    bookings = bookingRepository.getBookingsByBookerId_OrderByStartDesc(userId);
+                }
                 break;
             case CURRENT:
                 bookings = bookingRepository.getBookingsByBookerId_OrderByStart_Current(userId);
@@ -128,16 +133,23 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<BookingDto> getAllBookingsByOwner(Long userId, String state) {
+    public List<BookingDto> getAllBookingsByOwner(Long userId, String state, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
-
+        if (state != null && state.equals("UNSUPPORTED")) {
+            throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+        }
         BookingState bookingState = state == null ? BookingState.ALL : BookingState.valueOf(state);
+
         List<Booking> bookings;
 
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId);
+                if (pageable != null) {
+                    bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId, pageable);
+                } else {
+                    bookings = bookingRepository.getBookingsByItemOwnerOrderByStartDesc(userId);
+                }
                 break;
             case CURRENT:
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Current(userId);
@@ -146,7 +158,6 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Past(userId);
                 break;
             case FUTURE:
-                bookingRepository.getBookingsByOwnerAndStatus_Future(userId);
                 bookings = bookingRepository.getBookingsByOwnerAndStatus_Future(userId);
                 break;
             case WAITING:

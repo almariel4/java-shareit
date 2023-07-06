@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -70,10 +71,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getItemsByUser(Long userId) {
+    public List<ItemDto> getItemsByUser(Long userId, Pageable pageable) {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь с id = " + userId + " не найден"));
-        List<Item> items = itemRepository.findItemsByOwnerOrderById(userId);
+
+        List<Item> items;
+        if (pageable != null) {
+            items = itemRepository.findItemsByOwnerOrderById(userId, pageable);
+        } else {
+            items = itemRepository.findItemsByOwnerOrderById(userId);
+        }
         List<ItemDto> itemList = new ArrayList<>();
         for (Item item : items) {
             ItemDto itemDto = setBookings(userId, item);
@@ -83,7 +90,7 @@ public class ItemServiceImpl implements ItemService {
         return itemList;
     }
 
-    private ItemDto setBookings(Long userId, Item item) {
+    public ItemDto setBookings(Long userId, Item item) {
         ItemDto itemDto = ItemMapper.mapToItemDto(item);
         if (userId.equals(item.getOwner())) {
             Booking lastBooking = bookingRepository.getLastBooking(item.getId()).orElse(null);
@@ -110,10 +117,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> searchForItems(Long userId, String text) {
+    public List<ItemDto> searchForItems(Long userId, String text, Pageable pageable) {
         List<ItemDto> items = new ArrayList<>();
         if (!text.isBlank()) {
-            items = itemRepository.search(text).stream().map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+            if (pageable != null) {
+                items = itemRepository.search(text).stream().map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+            } else {
+                items = itemRepository.search(text, pageable).stream()
+                        .map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+            }
         }
         return items;
     }
@@ -138,7 +150,6 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException("Пользователь не может оставить комментарий к вещи");
         }
         Comment comment = CommentMapper.mapToComment(item, user, commentDto);
-        commentRepository.save(comment);
         return CommentMapper.mapToCommentDto(commentRepository.save(comment));
     }
 
