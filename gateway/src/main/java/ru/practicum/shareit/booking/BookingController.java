@@ -52,7 +52,6 @@ public class BookingController {
         return bookingClient.changeStatus(userId, bookingId, approved);
     }
 
-    //    custom
     @GetMapping("/owner")
     ResponseEntity<Object> getAllBookingsByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId,
                                                  @RequestParam(required = false, defaultValue = "ALL") String state,
