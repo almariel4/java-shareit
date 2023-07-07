@@ -35,7 +35,7 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getUser(long userId) {
-        return get("/" + userId );
+        return get("/" + userId);
     }
 
     public ResponseEntity<Object> createUser(UserDto userDto) {
