@@ -1,3 +1,4 @@
+FROM amazoncorretto:11
 VOLUME /tmp
 ARG JAR_FILE=target/*.jar
 ENV JAVA_OPTS=""
